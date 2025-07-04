@@ -1,6 +1,8 @@
 const Sequelize = require('sequelize');
+
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('initial_assessment', {
+
     idinitial_assessment: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
@@ -18,12 +20,20 @@ module.exports = function(sequelize, DataTypes) {
     user_iduser: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true,
       references: {
         model: 'user',
         key: 'iduser'
       }
+    },
+    specializtion_idspecializtion: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'specializtion',
+        key: 'idspecializtion'
+      }
     }
+
   }, {
     sequelize,
     tableName: 'initial_assessment',
@@ -34,25 +44,23 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "idinitial_assessment" },
-          { name: "user_iduser" },
+          { name: "idinitial_assessment" }
         ]
       },
       {
-        name: "idinitial_assessment_UNIQUE",
-        unique: true,
+        name: "fk_initial_assessment_user_idx",
         using: "BTREE",
         fields: [
-          { name: "idinitial_assessment" },
+          { name: "user_iduser" }
         ]
       },
       {
-        name: "fk_initial_assessment_user1_idx",
+        name: "fk_initial_assessment_specializtion_idx",
         using: "BTREE",
         fields: [
-          { name: "user_iduser" },
+          { name: "specializtion_idspecializtion" }
         ]
-      },
+      }
     ]
   });
 };

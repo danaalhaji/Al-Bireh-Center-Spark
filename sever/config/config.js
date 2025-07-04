@@ -1,14 +1,13 @@
-
-
 module.exports = {
-    host: "localhost",
-    user: "root",
+
+    username: "root",
     password: "root",
     database: "mydb",
+    host: "localhost",
+    dialect : "mysql",
+    seederStorage: "sequelize",
+    seederStorageTableName: "seeds",
+    migrationStorage: "sequelize",
+    migrationStorageTableName: "migrations"
 
-    seederStorage: 'sequelize',
-    seederStorageTableName: 'seeds',
-
-    migrationStorage: 'sequelize',
-    migrationStorageTableName: 'migrations',
-}
+};

@@ -67,7 +67,15 @@ module.exports = function(sequelize, DataTypes) {
           msg: 'Email must be a valid email'
         }
       }
-    }
+    },
+  specializtion_idspecializtion: {
+  type: DataTypes.INTEGER,
+  allowNull: true,
+  references: {
+    model: 'specializtion',
+    key: 'idspecializtion'
+  }
+},
   }, {
     sequelize,
     tableName: 'user',
@@ -77,19 +85,15 @@ module.exports = function(sequelize, DataTypes) {
         name: "PRIMARY",
         unique: true,
         using: "BTREE",
-        fields: [
-          { name: "iduser" },
-        ]
+        fields: [{ name: "iduser" }],
       },
       {
         name: "iduser_UNIQUE",
         unique: true,
         using: "BTREE",
-        fields: [
-          { name: "iduser" },
-        ]
+        fields: [{ name: "iduser" }],
       },
-    ]
+    ],
   });
 
   User.beforeCreate(async (user) => {
