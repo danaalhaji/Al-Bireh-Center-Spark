@@ -38,6 +38,13 @@ module.exports = function(sequelize, DataTypes) {
     }
   }
 },
+  nattionalId : {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    unique: {
+        msg: "This id is already in use",
+      }
+},
     is_active: {
       type: DataTypes.BOOLEAN,
       defaultValue: true

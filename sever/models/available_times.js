@@ -2,27 +2,25 @@ const Sequelize = require('sequelize');
 
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('available_times', {
+  const AvailabeTimes =  sequelize.define('available_times', {
     idavailable: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    is_booked: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false
-    },
     day_of_week: {
-      type: DataTypes.DATE,
+      type: DataTypes.ENUM(
+        "Satrday", "Sunday" , "Monday" , "Tuesday", "Wednsday" , "Thursday"
+      ),
       allowNull: false
     },
     from_time: {
-      type: DataTypes.DATE,
+      type: DataTypes.TIME,
       allowNull: false
     },
     to_time: {
-      type: DataTypes.DATE,
+      type: DataTypes.TIME,
       allowNull: false
     },
     user_iduser: {
@@ -65,4 +63,5 @@ module.exports = function(sequelize, DataTypes) {
       },
     ]
   });
+  return AvailabeTimes;
 };

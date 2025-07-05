@@ -4,6 +4,8 @@ const { requireAuth, checkUser } = require("./middleware/authMiddleware");
 
 const authRoutes = require("./routes/user.routes");
 const specRoutes = require("./routes/spec.routes");
+const timesRoutes = require("./routes/availableTimes.routes");
+
 const cookieparser = require("cookie-parser");
 
 const jwt = require('jsonwebtoken');
@@ -40,8 +42,9 @@ app.get("/", (req, res) => {
 });
 
 
-app.use("/api/auth" , requireAuth  ,authRoutes);
+app.use("/api/auth" , requireAuth  , authRoutes);
 app.use("/api/spec", requireAuth , specRoutes);
+app.use("/api/times", requireAuth , timesRoutes);
 
 
 // app connection 
