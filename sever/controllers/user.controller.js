@@ -227,10 +227,42 @@ exports.findTrainByNatId = async(req, res) =>{
 }
 
 // get all active users
-
+exports.getAllActiveTrainers = async (req, res) =>{
+  try{
+    const allActiveTrainers = await User.findAll({
+      where:{
+        is_active : true
+      }
+    })
+    return res.status(200).json({
+      message: "All active trainers",
+      data : allActiveTrainers})
+  }catch(error){
+    console.log("Error fetching all active trainers")
+    res.status(500).json({message : " Server error",
+    error: typeof error.message === "string" ? error.message : JSON.stringify(error)
+    })
+  }
+}
 // get all un-active users
 
 
-
+exports.getAllNotActiveTrainers = async (req, res) =>{
+  try{
+    const allNotActiveTrainers = await User.findAll({
+      where:{
+        is_active : false
+      }
+    })
+    return res.status(200).json({
+      message: "All active trainers",
+      data : allNotActiveTrainers})
+  }catch(error){
+    console.log("Error fetching all active trainers")
+    res.status(500).json({message : " Server error",
+    error: typeof error.message === "string" ? error.message : JSON.stringify(error)
+    })
+  }
+}
 
 

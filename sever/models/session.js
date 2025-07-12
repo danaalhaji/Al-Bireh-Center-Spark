@@ -1,6 +1,5 @@
-const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('session', {
+  const Session = sequelize.define('session', {
     idsession: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
@@ -18,6 +17,9 @@ module.exports = function(sequelize, DataTypes) {
     session_time: {
       type: DataTypes.DATE,
       allowNull: false
+    },is_booked:{
+      type: DataTypes.BOOLEAN,
+      allowNull: false
     },
     is_done: {
       type: DataTypes.BOOLEAN,
@@ -25,8 +27,6 @@ module.exports = function(sequelize, DataTypes) {
     },
     packeges_idpackeges: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
       references: {
         model: 'packeges',
         key: 'idpackeges'
@@ -91,4 +91,5 @@ module.exports = function(sequelize, DataTypes) {
       },
     ]
   });
+  return Session;
 };

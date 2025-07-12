@@ -10,5 +10,7 @@ router.put("/update", adminAuth ,authController.updateTrainer);
 router.get("/delete", adminAuth ,authController.deleteUser);
 router.get("/getAllTrainers", adminAuth ,authController.getAllTrainers);
 router.get("/getTrainer", adminAuth ,authController.findTrainByNatId);
+router.get("/getActiveTrainers", adminAuth ,authController.getAllActiveTrainers);
+router.get("/getNotActiveTrainers", adminAuth ,authController.getAllNotActiveTrainers);
 
 module.exports = router;

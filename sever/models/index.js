@@ -11,7 +11,8 @@ const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.p
 const db = {};
 db.User = require('./user')(sequelize, DataTypes);
 db.Spec = require('./specializtion')(sequelize, DataTypes);
-db.AvailabeTimes = require('./specializtion')(sequelize, DataTypes);
+db.AvailabeTimes = require('./available_times')(sequelize, DataTypes);
+db.Session = require('./session')(sequelize, DataTypes);
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 

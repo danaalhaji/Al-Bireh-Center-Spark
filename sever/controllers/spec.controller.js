@@ -98,7 +98,7 @@ exports.allSpecWithTrainers = async (req, res) => {
       where: { is_enabled: true },
       include: [{
         model: User,
-        attributes: ['first_name' , 'last_name']
+        attributes: ['iduser','first_name' , 'last_name']
       }]
     });
     if(!specs){
@@ -157,7 +157,7 @@ exports.getAllTrainInSpec = async (req , res) =>{
       where: { spe_type },
       include: [{
         model: User,
-        attributes: ['first_name' , 'last_name']
+        attributes: ['iduser','first_name' , 'last_name']
       }]
     });
         if(!allTrainerInSpec){
