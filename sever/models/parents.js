@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('partents', {
-    idpartents: {
+  const Parent = sequelize.define('parents', {
+    idparents: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -42,7 +42,7 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'partents',
+    tableName: 'parents',
     timestamps: true,
     indexes: [
       {
@@ -50,7 +50,7 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "idpartents" },
+          { name: "idparents" },
         ]
       },
       {
@@ -62,13 +62,14 @@ module.exports = function(sequelize, DataTypes) {
         ]
       },
       {
-        name: "idpartents_UNIQUE",
+        name: "idparents_UNIQUE",
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "idpartents" },
+          { name: "idparents" },
         ]
       },
     ]
   });
+  return Parent
 };

@@ -17,7 +17,8 @@ module.exports = function(sequelize, DataTypes) {
     session_time: {
       type: DataTypes.DATE,
       allowNull: false
-    },is_booked:{
+    },
+    is_booked:{
       type: DataTypes.BOOLEAN,
       allowNull: false
     },

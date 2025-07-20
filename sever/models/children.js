@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('children', {
+module.exports = function(sequelize, DataTypes)  {
+  const Child =  sequelize.define('children', {
     idchildren: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -22,19 +22,19 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(45),
       allowNull: false
     },
-    partents_idpartents: {
+    partents_idparents: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
+      allowNull: true,
+      primaryKey: false,
       references: {
-        model: 'partents',
-        key: 'idpartents'
+        model: 'parents',
+        key: 'idparents'
       }
     },
     packeges_idpackeges: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
+      allowNull: true,
+      primaryKey: false,
       references: {
         model: 'packeges',
         key: 'idpackeges'
@@ -42,8 +42,8 @@ module.exports = function(sequelize, DataTypes) {
     },
     initial_assessment_idinitial_assessment: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
+      allowNull: true,
+      primaryKey: false,
       references: {
         model: 'initial_assessment',
         key: 'idinitial_assessment'
@@ -51,8 +51,8 @@ module.exports = function(sequelize, DataTypes) {
     },
     initial_assessment_user_iduser: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
+      allowNull: true,
+      primaryKey: false,
       references: {
         model: 'initial_assessment',
         key: 'user_iduser'
@@ -69,7 +69,7 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "idchildren" },
-          { name: "partents_idpartents" },
+          { name: "parents_idparents" },
           { name: "packeges_idpackeges" },
           { name: "initial_assessment_idinitial_assessment" },
           { name: "initial_assessment_user_iduser" },
@@ -84,10 +84,10 @@ module.exports = function(sequelize, DataTypes) {
         ]
       },
       {
-        name: "fk_children_partents_idx",
+        name: "fk_children_parents_idx",
         using: "BTREE",
         fields: [
-          { name: "partents_idpartents" },
+          { name: "parents_idparents" },
         ]
       },
       {
@@ -107,4 +107,5 @@ module.exports = function(sequelize, DataTypes) {
       },
     ]
   });
+  return Child ;
 };

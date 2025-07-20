@@ -1,6 +1,5 @@
 const { User, Session , AvailabeTimes ,Packages } = require("../models");
 
-
 // create session
 
 exports.bookSession = async (req, res) =>{
@@ -47,7 +46,7 @@ exports.bookSession = async (req, res) =>{
                     available_times_user_iduser : iduser
                 }
             })
-            const newSession = Session.creat({
+            const newSession = Session.create({
                 session_number: previousSessionCount+1,
                 session_date: date,
                 session_time: sessionStart,
@@ -62,14 +61,15 @@ exports.bookSession = async (req, res) =>{
                 session : newSession
             })
         }
+        // save in initial assement
         if(inital_assesment == true){
-            const newSession = Session.creat({
-                session_number: 1, 
+            const newSession = Session.create({
+                session_number: 0, 
                 session_date: date,
                 session_time: sessionStart,
                 is_booked: true,
                 is_done: false,
-                packeges_idpackeges: package_id || null,
+                packeges_idpackeges: package_id,
                 available_times_idavailable: availableTime.idavailable,
                 available_times_user_iduser: iduser
             })
@@ -84,10 +84,10 @@ exports.bookSession = async (req, res) =>{
     }
 }
 
+// count all sessions 
 
 // get all sessions from today's date
-
-// get all bokked session for a trainer
+// get all booked session for a trainer
 // get all done sessions for a trainer
 // get all session for child 
 // get all done sessions for a child

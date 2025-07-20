@@ -244,8 +244,8 @@ exports.getAllActiveTrainers = async (req, res) =>{
     })
   }
 }
-// get all un-active users
 
+// get all un-active users
 
 exports.getAllNotActiveTrainers = async (req, res) =>{
   try{

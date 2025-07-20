@@ -4,7 +4,6 @@ const available_times = require("../models/available_times");
 // create working time for a trainer
 
 exports.createTimesForTrainer = async (req , res) =>{
-
     try{
         const {iduser , availabeTimes } = req.body;
         const user = await User.findOne({

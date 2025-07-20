@@ -6,6 +6,7 @@ const authRoutes = require("./routes/user.routes");
 const specRoutes = require("./routes/spec.routes");
 const timesRoutes = require("./routes/availableTimes.routes");
 const sessionsRoutes = require("./routes/sessions.routes");
+const childrenRoutes = require("./routes/children.routes")
 
 
 const cookieparser = require("cookie-parser");
@@ -48,6 +49,7 @@ app.use("/api/auth"   , authRoutes);
 app.use("/api/spec", requireAuth , specRoutes);
 app.use("/api/times", requireAuth , timesRoutes);
 app.use("/api/sessions", requireAuth , sessionsRoutes);
+app.use("/api/child", requireAuth , childrenRoutes);
 
 
 // app connection 
