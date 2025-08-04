@@ -17,15 +17,30 @@ module.exports = function(sequelize, DataTypes) {
     },
     phone_number: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
+      validate: {
+        is: {
+          args: /^(?:\+?972|972|0)(5[0-9]{8})$/,
+          msg: "Invalid phone number format.",
+        }
+      }
     },
     email: {
       type: DataTypes.STRING(45),
-      allowNull: false
+      allowNull: false,
+      unique: {
+        msg: "This email is already in use",
+      },
+      validate: {
+        isEmail: {
+          args: true,
+          msg: 'Email must be a valid email'
+        }
+      }
     },
     notes: {
       type: DataTypes.STRING(45),
-      allowNull: false
+      allowNull: true
     },
     relationship: {
       type: DataTypes.STRING(45),

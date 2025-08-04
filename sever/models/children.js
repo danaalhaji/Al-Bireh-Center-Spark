@@ -19,10 +19,12 @@ module.exports = function(sequelize, DataTypes)  {
       allowNull: false
     },
     gender: {
-      type: DataTypes.STRING(45),
+      type: DataTypes.ENUM(
+        "Male", "Female"
+      ),
       allowNull: false
     },
-    partents_idparents: {
+    parents_idparents: {
       type: DataTypes.INTEGER,
       allowNull: true,
       primaryKey: false,
@@ -39,24 +41,6 @@ module.exports = function(sequelize, DataTypes)  {
         model: 'packeges',
         key: 'idpackeges'
       }
-    },
-    initial_assessment_idinitial_assessment: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      primaryKey: false,
-      references: {
-        model: 'initial_assessment',
-        key: 'idinitial_assessment'
-      }
-    },
-    initial_assessment_user_iduser: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      primaryKey: false,
-      references: {
-        model: 'initial_assessment',
-        key: 'user_iduser'
-      }
     }
   }, {
     sequelize,
@@ -70,9 +54,6 @@ module.exports = function(sequelize, DataTypes)  {
         fields: [
           { name: "idchildren" },
           { name: "parents_idparents" },
-          { name: "packeges_idpackeges" },
-          { name: "initial_assessment_idinitial_assessment" },
-          { name: "initial_assessment_user_iduser" },
         ]
       },
       {
@@ -89,23 +70,9 @@ module.exports = function(sequelize, DataTypes)  {
         fields: [
           { name: "parents_idparents" },
         ]
-      },
-      {
-        name: "fk_children_packeges1_idx",
-        using: "BTREE",
-        fields: [
-          { name: "packeges_idpackeges" },
-        ]
-      },
-      {
-        name: "fk_children_initial_assessment1_idx",
-        using: "BTREE",
-        fields: [
-          { name: "initial_assessment_idinitial_assessment" },
-          { name: "initial_assessment_user_iduser" },
-        ]
-      },
+      }
     ]
   });
+
   return Child ;
 };

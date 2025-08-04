@@ -1,14 +1,16 @@
-const { User, Session , AvailabeTimes ,Packages } = require("../models");
+const { User, Session , AvailabeTimes ,Packages, Child } = require("../models");
+const { Op } = require("sequelize");
 
 // create session
 
-exports.bookSession = async (req, res) =>{
+/*exports.bookSession = async (req, res) =>{
     try{
-        const {iduser, date , time , package_id , inital_assesment } = req.body ;
+        const {iduser,idchildren, date , time , package_id , inital_assesment } = req.body ;
         if(!iduser || !date || !time){
             return res.status(400).json({message : " User ID , date and time are required "});
         }
-        const dayOfWeek = new Date.now(date).toLocalDateString('en-US' , {weekday : 'long'});
+        const d = new Date(date);
+        const dayOfWeek =  d.getDay()
         // check for trainer availablity
 
         const availabetime = await AvailabeTimes.findOne({
@@ -54,7 +56,8 @@ exports.bookSession = async (req, res) =>{
                 is_done: false,
                 packeges_idpackeges: package_id || null,
                 available_times_idavailable: availableTime.idavailable,
-                available_times_user_iduser: iduser
+                available_times_user_iduser: iduser,
+                children_idchild:idchildren
             })
             return res.status(200).json({
                 message : "Session was booked successfully ",
@@ -69,7 +72,7 @@ exports.bookSession = async (req, res) =>{
                 session_time: sessionStart,
                 is_booked: true,
                 is_done: false,
-                packeges_idpackeges: package_id,
+                packeges_idpackeges: null,
                 available_times_idavailable: availableTime.idavailable,
                 available_times_user_iduser: iduser
             })
@@ -78,15 +81,163 @@ exports.bookSession = async (req, res) =>{
                 session : newSession
             })
         }
-    }catch{
-        console.error("Error booking session:", error.message);
+    }catch(error){
+        console.error("Error booking session:", error);
         res.status(500).json({ message: "Server error" });
     }
 }
+*/
+exports.bookSession = async (req, res) => {
+    try {
+        const { iduser, idchildren, date, time, package_id, inital_assesment } = req.body;
+        console.log(date)
+        if (!iduser || !date || !time) {
+            return res.status(400).json({ message: "User ID, date and time are required" });
+        }
+
+        const d = new Date(date);
+        const dayOfWeek = d.getDay();
+
+        // Check for trainer availability
+        const availabetime = await AvailabeTimes.findOne({
+            where: {
+                user_iduser: iduser,
+                day_of_week: dayOfWeek
+            }
+        });
+        console.log(availabetime)
+        if (!availabetime) {
+            return res.status(400).json({
+                message: `The Trainer is not available at "${date}" "${time}", Please choose another time`
+            });
+        }
+        const isoDate = date.split("-").reverse().join("-");
+        const sessionStart = new Date(`${date}T${time}`);
+        const sessionEnd = new Date(sessionStart.getTime() + 45 * 60000);
+        const sessionDateOnly = isoDate;
+        console.log("session date",sessionStart)
+        const formattedTime = time.length === 5 ? time + ':00' : time;
+        console.log("formattedTime", formattedTime)
+        // Check if session is already booked
+        console.log('sessionDateOnly:', sessionDateOnly, typeof sessionDateOnly);
+        console.log('time:', formattedTime, typeof formattedTime);
+        console.log('available_times_idavailable:', availabetime.idavailable, typeof availabetime.idavailable);
+        console.log('available_times_user_iduser:', iduser, typeof iduser);
+        console.log('children_idchild:', idchildren, typeof idchildren);
+
+        const excitedSession = await Session.findOne({
+            where: {
+                session_date: new Date(sessionDateOnly),
+                session_time: formattedTime,
+                available_times_idavailable: availabetime.idavailable,
+                [Op.or]: [
+                {  available_times_user_iduser: Number(iduser) },
+                {  children_idchild: Number(idchildren) }
+        ]
+            }
+        });
+        console.log("excitedSession is",excitedSession)
+        if(excitedSession) {
+            return res.status(400).json({ message: "This session is already booked!" });
+        }
+
+        let newSession;
+
+        if (inital_assesment == false) {
+            const previousSessionCount = await Session.count({
+                where: {
+                    packeges_idpackeges: package_id,
+                    available_times_user_iduser: Number(iduser),
+                    children_idchild: Number(idchildren)
+                }
+            });
+            if(previousSessionCount >=5){
+            newSession = await Session.create({
+                session_number: previousSessionCount+1,
+                session_date: sessionDateOnly,  
+                session_time: time,             
+                is_booked: true,
+                is_done: false,
+                packeges_idpackeges: package_id,
+                available_times_idavailable: availabetime.idavailable,
+                available_times_user_iduser: iduser,
+                children_idchild: idchildren
+            });
+        }
+        } else if (inital_assesment == true) {
+            newSession = await Session.create({
+                session_number: 0,
+                session_date: sessionDateOnly,  
+                session_time: time,             
+                is_booked: true,
+                is_done: false,
+                packeges_idpackeges: null,
+                available_times_idavailable: availabetime.idavailable,
+                available_times_user_iduser: iduser,
+                children_idchild: idchildren
+            });
+            console.log("new sessios is :" , newSession)
+            return res.status(200).json({
+            message: "Session was booked successfully",
+            session: newSession,
+            data : newSession
+        });
+
+        }
+        console.log("new sessios is :" , newSession)
+
+
+    }catch (error) {
+        console.error("Error booking session:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
 
 // count all sessions 
+exports.countAllSession = async(req, res) =>{
+    try{
+        const numOfSessions = await Session.count()
+        if(numOfSessions){
+            return res.status(200).json({
+                message : `you have ${numOfSessions}`,
+                data : countAllSession
+            })
+        }
+    }catch(error){
+        console.error("Error fetching number of sessions", error.message);
+        res.status(500).json({ message: "Server error" });
+    }
 
-// get all sessions from today's date
+}
+// get all sessions this month 
+
+exports.sessionThisMonth = async (req, res) => {
+    try{
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+
+        const endOfMonth = new Date(startOfMonth);
+        endOfMonth.setMonth(endOfMonth.getMonth() + 1);
+
+        const sessionsThisMonth = await Session.findAll({
+          where: {
+            session_date: {
+              [Op.gte]: startOfMonth,
+              [Op.lt]: endOfMonth
+            }
+        }})
+        return res.status(200).json({
+            message : `You have ${sessionsThisMonth} sessions this month`,
+            data : sessionsThisMonth
+        })
+    }catch(error){
+            console.error("Error fetching number of sessions", error.message);
+            res.status(500).json({ message: "Server error" });
+    }
+}
+
+//count of all session booked this month
 // get all booked session for a trainer
 // get all done sessions for a trainer
 // get all session for child 

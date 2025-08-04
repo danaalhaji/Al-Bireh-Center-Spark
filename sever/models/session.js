@@ -15,7 +15,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     },
     session_time: {
-      type: DataTypes.DATE,
+      type: DataTypes.TIME,
       allowNull: false
     },
     is_booked:{
@@ -28,6 +28,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     packeges_idpackeges: {
       type: DataTypes.INTEGER,
+      allowNull: true,
       references: {
         model: 'packeges',
         key: 'idpackeges'
@@ -36,7 +37,6 @@ module.exports = function(sequelize, DataTypes) {
     available_times_idavailable: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true,
       references: {
         model: 'available_times',
         key: 'idavailable'
@@ -45,13 +45,20 @@ module.exports = function(sequelize, DataTypes) {
     available_times_user_iduser: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true,
       references: {
         model: 'available_times',
         key: 'user_iduser'
       }
+    },
+  children_idchild: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'children',
+      key: 'idchildren'
     }
-  }, {
+  }
+}, {
     sequelize,
     tableName: 'session',
     timestamps: true,
@@ -90,6 +97,13 @@ module.exports = function(sequelize, DataTypes) {
           { name: "available_times_user_iduser" },
         ]
       },
+  {
+    name: "fk_session_children_idx",
+    using: "BTREE",
+    fields: [
+      { name: "children_idchild" }
+    ]
+  }
     ]
   });
   return Session;

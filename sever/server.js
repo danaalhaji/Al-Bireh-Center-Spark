@@ -1,7 +1,7 @@
 const express = require('express');
 const db = require("./models");
 const { requireAuth, checkUser } = require("./middleware/authMiddleware");
-
+const cors = require('cors')
 const authRoutes = require("./routes/user.routes");
 const specRoutes = require("./routes/spec.routes");
 const timesRoutes = require("./routes/availableTimes.routes");
@@ -21,6 +21,8 @@ const jwt = require('jsonwebtoken');
 });*/
 
 
+
+
  // connect db 
 try{
     db.sequelize.sync({ alter: true }).then(() => {
@@ -29,8 +31,11 @@ try{
     console.error('Unable to connect to the database:', error);
 }
 
+
+
 // start my app
 const app = express();
+app.use(cors());
 app.use(express.json());
 app.use(cookieparser());
 

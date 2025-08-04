@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('payment', {
+  const Payment = sequelize.define('payment', {
     idpayment: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -12,8 +12,8 @@ module.exports = function(sequelize, DataTypes) {
     },
     packeges_idpackeges: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
+      allowNull: true,
+      primaryKey: false,
       references: {
         model: 'packeges',
         key: 'idpackeges'
@@ -51,4 +51,5 @@ module.exports = function(sequelize, DataTypes) {
       },
     ]
   });
+  return Payment;
 };

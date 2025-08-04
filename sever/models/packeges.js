@@ -9,10 +9,12 @@ module.exports = function(sequelize, DataTypes) {
     },
     num_of_sessions: {
       type: DataTypes.INTEGER,
+      defaultValue : 8,
       allowNull: true
     },
     progress_rate: {
       type: DataTypes.DECIMAL(10,0),
+      defaultValue : 0,
       allowNull: false
     },
     start_date: {
@@ -25,6 +27,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     balance: {
       type: DataTypes.INTEGER,
+      defaultValue : -500,
       allowNull: true
     }
   }, {
