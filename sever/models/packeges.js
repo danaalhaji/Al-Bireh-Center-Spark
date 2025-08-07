@@ -9,7 +9,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     num_of_sessions: {
       type: DataTypes.INTEGER,
-      defaultValue : 8,
+      defaultValue : 5,
       allowNull: true
     },
     progress_rate: {
@@ -27,10 +27,27 @@ module.exports = function(sequelize, DataTypes) {
     },
     balance: {
       type: DataTypes.INTEGER,
-      defaultValue : -500,
+      defaultValue : "-500",
       allowNull: true
-    }
-  }, {
+    },    
+    specializtion_idspecializtion: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'specializtion',
+        key: 'idspecializtion'
+      }
+    },
+    children_idchild: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'children',
+        key: 'idchildren'
+      }
+}
+  }
+  , {
     sequelize,
     tableName: 'packeges',
     timestamps: true,

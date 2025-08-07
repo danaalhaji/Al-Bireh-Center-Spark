@@ -140,6 +140,7 @@ exports.updateChildProfile = async(req, res) =>{
         return res.status(500).json({ error: "Internal Server Error" })
     }
 }
+
 // delete child 
 
 //Number of children added this month

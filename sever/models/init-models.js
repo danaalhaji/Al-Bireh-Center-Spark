@@ -119,9 +119,13 @@ function initModels(sequelize) {
   parents.hasMany(children, { as: "children", foreignKey: "parents_idparents" });
 
   // Child-Sessions
-  session.belongsTo(children, { as: "children_idchildren", foreignKey: "children_idchildren" });
-  children.hasMany(session, { as: "sessions", foreignKey: "children_idchildren" });
+  session.belongsTo(children, { as: "children_idchild", foreignKey: "children_idchild" });
+  children.hasMany(session, { as: "sessions", foreignKey: "children_idchild" });
 
+  //Child-Packages
+  packeges.belongsTo(children, {as: "child",foreignKey: "children_idchild"});
+  children.hasMany(packeges, {as: "packeges",foreignKey: "children_idchild"});
+  
   // Specialization-Packages
   packeges.belongsTo(specializtion, { as: "specializtion_idspecializtion", foreignKey: "specializtion_idspecializtion" });
   specializtion.hasMany(packeges, { as: "packeges", foreignKey: "specializtion_idspecializtion" });

@@ -26,6 +26,17 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.BOOLEAN,
       allowNull: false
     },
+    session_type:{
+      type: DataTypes.ENUM(
+        "0","1","2"
+      ),
+      allowNull: false,
+      defaultValue :"0"
+    },
+    notes:{
+      type: DataTypes.TEXT,
+      allowNull : true
+    },
     packeges_idpackeges: {
       type: DataTypes.INTEGER,
       allowNull: true,

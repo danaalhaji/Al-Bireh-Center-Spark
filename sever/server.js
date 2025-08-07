@@ -6,7 +6,9 @@ const authRoutes = require("./routes/user.routes");
 const specRoutes = require("./routes/spec.routes");
 const timesRoutes = require("./routes/availableTimes.routes");
 const sessionsRoutes = require("./routes/sessions.routes");
-const childrenRoutes = require("./routes/children.routes")
+const childrenRoutes = require("./routes/children.routes");
+const packageRoutes = require("./routes/packages.routes");
+const paymentRoutes = require("./routes/payment.routes");
 
 
 const cookieparser = require("cookie-parser");
@@ -55,7 +57,8 @@ app.use("/api/spec", requireAuth , specRoutes);
 app.use("/api/times", requireAuth , timesRoutes);
 app.use("/api/sessions", requireAuth , sessionsRoutes);
 app.use("/api/child", requireAuth , childrenRoutes);
-
+app.use("/api/package", requireAuth , packageRoutes);
+app.use("/api/payment", requireAuth , paymentRoutes);
 
 // app connection 
 app.listen('8000', () =>{

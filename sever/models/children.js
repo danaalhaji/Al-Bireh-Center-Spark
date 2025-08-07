@@ -32,15 +32,6 @@ module.exports = function(sequelize, DataTypes)  {
         model: 'parents',
         key: 'idparents'
       }
-    },
-    packeges_idpackeges: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      primaryKey: false,
-      references: {
-        model: 'packeges',
-        key: 'idpackeges'
-      }
     }
   }, {
     sequelize,

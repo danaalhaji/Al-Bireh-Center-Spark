@@ -89,7 +89,7 @@ const { Op } = require("sequelize");
 */
 exports.bookSession = async (req, res) => {
     try {
-        const { iduser, idchildren, date, time, package_id, inital_assesment } = req.body;
+        const { iduser, idchildren, date, time, package_id, session_type ,notes } = req.body;
         console.log(date)
         if (!iduser || !date || !time) {
             return res.status(400).json({ message: "User ID, date and time are required" });
@@ -142,8 +142,13 @@ exports.bookSession = async (req, res) => {
         }
 
         let newSession;
-
-        if (inital_assesment == false) {
+        const child = await Child.findByPk(idchildren)
+        if(!child){
+            return res.status(400).json({
+                message : "Error fetching child !"
+            })
+        }
+        if (session_type =="2") {
             const previousSessionCount = await Session.count({
                 where: {
                     packeges_idpackeges: package_id,
@@ -151,30 +156,35 @@ exports.bookSession = async (req, res) => {
                     children_idchild: Number(idchildren)
                 }
             });
-            if(previousSessionCount >=5){
+            if(previousSessionCount < 5){
             newSession = await Session.create({
                 session_number: previousSessionCount+1,
                 session_date: sessionDateOnly,  
                 session_time: time,             
                 is_booked: true,
                 is_done: false,
-                packeges_idpackeges: package_id,
+                packeges_idpackeges: Packages.package_id,
                 available_times_idavailable: availabetime.idavailable,
                 available_times_user_iduser: iduser,
-                children_idchild: idchildren
+                children_idchild: child.idchildren,
+                notes:notes || null
             });
+        }else{
+            return res.status(400).json({ message: "You have now finished allowed number of sessions for this package please choose another package !" });
         }
-        } else if (inital_assesment == true) {
+        } else if (session_type == "0" || session_type == "1") {
             newSession = await Session.create({
                 session_number: 0,
                 session_date: sessionDateOnly,  
                 session_time: time,             
                 is_booked: true,
                 is_done: false,
+                session_type : session_type,
                 packeges_idpackeges: null,
                 available_times_idavailable: availabetime.idavailable,
                 available_times_user_iduser: iduser,
-                children_idchild: idchildren
+                children_idchild: child.idchildren,
+                notes:notes || null
             });
             console.log("new sessios is :" , newSession)
             return res.status(200).json({
@@ -220,7 +230,7 @@ exports.sessionThisMonth = async (req, res) => {
         const endOfMonth = new Date(startOfMonth);
         endOfMonth.setMonth(endOfMonth.getMonth() + 1);
 
-        const sessionsThisMonth = await Session.findAll({
+        const sessionsThisMonth = await Session.count({
           where: {
             session_date: {
               [Op.gte]: startOfMonth,
@@ -237,9 +247,74 @@ exports.sessionThisMonth = async (req, res) => {
     }
 }
 
-//count of all session booked this month
+// all sessions booked this month
+
+exports.allSessionsThisMonth = async (req, res) => {
+    try{
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+
+        const endOfMonth = new Date(startOfMonth);
+        endOfMonth.setMonth(endOfMonth.getMonth() + 1);
+
+        const sessionsThisMonth = await Session.findAll({
+          where: {
+            session_date: {
+              [Op.gte]: startOfMonth,
+              [Op.lt]: endOfMonth
+            }
+        }})
+        return res.status(200).json({
+            message : `You have ${sessionsThisMonth} sessions this month`,
+            data : sessionsThisMonth
+        })
+    }catch(error){
+            console.error("Error fetching number of sessions", error.message);
+            res.status(500).json({ message: "Server error" });
+    }
+}
 // get all booked session for a trainer
+exports.allSessionsThisMonthForTrainer = async (req, res) => {
+    try{
+        const{ iduser } = req.body;
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+
+        const endOfMonth = new Date(startOfMonth);
+        endOfMonth.setMonth(endOfMonth.getMonth() + 1);
+        // find user
+        const user = await User.findOne({
+            where : {
+                iduser : iduser
+            }
+        })
+        if(!user){
+            return res.status(400).json({
+                message: "Incorect Id for trainer"
+            })
+        }
+        const sessionsThisMonth = await Session.findAll({
+          where: {
+            session_date: {
+              [Op.gte]: startOfMonth,
+              [Op.lt]: endOfMonth
+            },
+            available_times_user_iduser : user.iduser
+        }})
+        return res.status(200).json({
+            message : `${user.first_name} ${user.last_name} have ${sessionsThisMonth} sessions this month`,
+            data : sessionsThisMonth
+        })
+    }catch(error){
+            console.error("Error fetching number of sessions", error.message);
+            res.status(500).json({ message: "Server error" });
+    }
+}
+
 // get all done sessions for a trainer
 // get all session for child 
 // get all done sessions for a child
+// get sessions dates for package and if they are done or not
 // update session
