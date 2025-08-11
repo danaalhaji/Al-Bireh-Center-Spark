@@ -44,7 +44,12 @@ module.exports = function(sequelize, DataTypes) {
       references: {
         model: 'children',
         key: 'idchildren'
-      }
+      },
+    package_desc: {
+      type: DataTypes.STRING,
+      unique : true,
+      allowNull: false
+    },
 }
   }
   , {

@@ -1,10 +1,11 @@
-const {Packages,Child , Spec} = require('../models');
+const { where } = require('sequelize');
+const {Packages,Child , Spec, Session} = require('../models');
 
 
 // create package 
 exports.createPackage = async(req,res) =>{
     try{
-        const {childId , notes, spe_type } =req.body ;
+        const {childId , notes,package_desc ,spe_type } =req.body ;
         // check if child existes
         const child = await Child.findByPk(childId)
         //check if specillization exites
@@ -23,6 +24,7 @@ exports.createPackage = async(req,res) =>{
             const newPackage = await Packages.create({
                 children_idchild : child.idchildren,
                 specializtion_idspecializtion : spec.idspecializtion,
+                package_desc : package_desc,
                 notes : notes || null
             });
             if(newPackage){
@@ -43,4 +45,41 @@ exports.createPackage = async(req,res) =>{
 }
 
 // view package details for a child
+exports.viewPackageForaChild = async(req, res) =>{
+    try{
+        const {childId , package_desc} = req.body;
+        const child = await Child.findByPk(childId)
+        const package_Child =  await Packages.findOne({
+            where : {
+                package_desc :package_desc,
+                children_idchild : child.idchildren
+            },include: [{
+                model: Child,
+                as: 'child',
+                attributes: ['first_name' , 'last_name']
+                },{
+                model : Session,
+                as : 'sessions',
+                attributes : ['session_number', 'session_date' , 'is_done' , 'notes']    
+                }
+            ]
+        })
+        if(!package_Child){
+            console.log("Package not found check child id or package describtion");
+            return res.status(400).json({
+                message : "Error fetching package"
+            })
+        }
+        res.status(200).json({
+            message : `Package ${package_desc} for ${child.first_name} ${child.last_name} was found as the following data:`,
+            package_Child
+        })
+
+    }catch(error){
+        console.log("Error fetchinf package" , error.message);
+        return res.status(400).json({
+            message : "Server Error"
+        })
+    }
+}
 
