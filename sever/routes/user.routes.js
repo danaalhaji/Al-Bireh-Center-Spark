@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/user.controller");
-const { adminAuth } = require("../middleware/authMiddleware");
+const { adminAuth, requireAuth } = require("../middleware/authMiddleware");
 
 
 router.post("/login", authController.login);
@@ -12,5 +12,7 @@ router.get("/getAllTrainers", adminAuth ,authController.getAllTrainers);
 router.get("/getTrainer", adminAuth ,authController.findTrainByNatId);
 router.get("/getActiveTrainers", adminAuth ,authController.getAllActiveTrainers);
 router.get("/getNotActiveTrainers", adminAuth ,authController.getAllNotActiveTrainers);
+router.get("/findtrainer", requireAuth , authController.findByNameOrPhone)
+
 
 module.exports = router;

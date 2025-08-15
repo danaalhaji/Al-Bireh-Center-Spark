@@ -32,7 +32,7 @@ module.exports = function(sequelize, DataTypes) {
     },    
     specializtion_idspecializtion: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       references: {
         model: 'specializtion',
         key: 'idspecializtion'
@@ -40,12 +40,12 @@ module.exports = function(sequelize, DataTypes) {
     },
     children_idchild: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       references: {
         model: 'children',
         key: 'idchildren'
       },
-    package_desc: {
+    package_name: {
       type: DataTypes.STRING,
       unique : true,
       allowNull: false
@@ -63,6 +63,8 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "idpackeges" },
+          { name: "children_idchild" },
+          { name: "specializtion_idspecializtion" }
         ]
       },
       {
@@ -72,7 +74,13 @@ module.exports = function(sequelize, DataTypes) {
         fields: [
           { name: "idpackeges" },
         ]
-      },
+      },{
+        name: "packeges_ibfk_2",
+        using: "BTREE",
+        fields: [
+          { name: "children_idchild" },
+        ]
+      }
     ]
   });
   return Packages;

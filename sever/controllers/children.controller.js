@@ -1,4 +1,5 @@
 const { Child , Parent  } = require("../models");
+const { Op } = require("sequelize");
 const { all } = require("../routes/user.routes");
 
 // create child and parent
@@ -55,6 +56,7 @@ exports.createChild =  async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 // count all children
 
 exports.countAllChildren = async(req, res)=>{
@@ -121,6 +123,7 @@ exports.getAllChildren = async (req,res)=>{
     }
 }
 
+
 // update child profile
 exports.updateChildProfile = async(req, res) =>{
     try{
@@ -141,6 +144,46 @@ exports.updateChildProfile = async(req, res) =>{
     }
 }
 
-// delete child 
+
 
 //Number of children added this month
+
+exports.countOfChildrenThisMonth = async (req,res)=>{
+    try{
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+
+        const endOfMonth = new Date(startOfMonth);
+        endOfMonth.setMonth(endOfMonth.getMonth() + 1);
+
+        const childrenCount = await Child.count({
+            where : {
+                created_At : {
+                    [Op.gte]: startOfMonth,
+                    [Op.lt]: endOfMonth
+                }
+            }
+        })
+        if(!childrenCount){
+            console.log("No children were added this month")
+            return res.stats(400).json({
+                message : "No children were added this month!",
+            })
+        }
+        return res.status(200).json({
+            message : `Number of children added this month ${childrenCount}`,
+            childrenCount
+        })
+    }catch(error){  
+        console.log("Server Error" , error.message);
+        return res.status(200).json({
+            message : "Server Error"
+        })
+
+    }
+}
+
+// find child by parent phone or child name 
+
+// delete child 

@@ -1,5 +1,6 @@
 const { User, Session , AvailabeTimes ,Packages, Child } = require("../models");
 const { Op } = require("sequelize");
+const session = require("../models/session");
 
 // create session
 
@@ -95,9 +96,11 @@ exports.bookSession = async (req, res) => {
             return res.status(400).json({ message: "User ID, date and time are required" });
         }
 
-        const d = new Date(date);
-        const dayOfWeek = d.getDay();
-
+        const [day, month, year] = date.split("-");
+        const d = new Date(`${year}-${month}-${day}`);
+        const daysMap = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const dayOfWeek = daysMap[d.getDay()];
+        console.log(dayOfWeek)
         // Check for trainer availability
         const availabetime = await AvailabeTimes.findOne({
             where: {
@@ -105,6 +108,7 @@ exports.bookSession = async (req, res) => {
                 day_of_week: dayOfWeek
             }
         });
+
         console.log(availabetime)
         if (!availabetime) {
             return res.status(400).json({
@@ -129,13 +133,13 @@ exports.bookSession = async (req, res) => {
             where: {
                 session_date: new Date(sessionDateOnly),
                 session_time: formattedTime,
-                available_times_idavailable: availabetime.idavailable,
                 [Op.or]: [
                 {  available_times_user_iduser: Number(iduser) },
                 {  children_idchild: Number(idchildren) }
         ]
             }
         });
+
         console.log("excitedSession is",excitedSession)
         if(excitedSession) {
             return res.status(400).json({ message: "This session is already booked!" });
@@ -149,6 +153,12 @@ exports.bookSession = async (req, res) => {
             })
         }
         if (session_type =="2") {
+            const packageForBooking = await Packages.findByPk(package_id);
+            if(!packageForBooking){
+                return res.status(400).json({
+                    message :"No package was found!"
+                })
+            }
             const previousSessionCount = await Session.count({
                 where: {
                     packeges_idpackeges: package_id,
@@ -156,19 +166,25 @@ exports.bookSession = async (req, res) => {
                     children_idchild: Number(idchildren)
                 }
             });
-            if(previousSessionCount < 5){
+            if(previousSessionCount < 8){
             newSession = await Session.create({
                 session_number: previousSessionCount+1,
+                session_type : session_type,
                 session_date: sessionDateOnly,  
                 session_time: time,             
                 is_booked: true,
                 is_done: false,
-                packeges_idpackeges: Packages.package_id,
+                packeges_idpackeges: packageForBooking.idpackeges,
                 available_times_idavailable: availabetime.idavailable,
                 available_times_user_iduser: iduser,
                 children_idchild: child.idchildren,
                 notes:notes || null
             });
+            return res.status(200).json({
+                message: "Session was booked successfully",
+                session: newSession,
+                data : newSession
+        });
         }else{
             return res.status(400).json({ message: "You have now finished allowed number of sessions for this package please choose another package !" });
         }
@@ -247,7 +263,7 @@ exports.sessionThisMonth = async (req, res) => {
     }
 }
 
-// all sessions booked this month
+// all sessions booked this month 
 
 exports.allSessionsThisMonth = async (req, res) => {
     try{
@@ -257,7 +273,7 @@ exports.allSessionsThisMonth = async (req, res) => {
 
         const endOfMonth = new Date(startOfMonth);
         endOfMonth.setMonth(endOfMonth.getMonth() + 1);
-
+        // add child and trainer
         const sessionsThisMonth = await Session.findAll({
           where: {
             session_date: {
@@ -274,7 +290,8 @@ exports.allSessionsThisMonth = async (req, res) => {
             res.status(500).json({ message: "Server error" });
     }
 }
-// get all booked session for a trainer
+
+// get all booked sessions this month for a trainer
 exports.allSessionsThisMonthForTrainer = async (req, res) => {
     try{
         const{ iduser } = req.body;
@@ -313,8 +330,187 @@ exports.allSessionsThisMonthForTrainer = async (req, res) => {
     }
 }
 
+
+
+
+// get all sessions for a trainer
+
+exports.getSessionsForTrainer = async (req, res) =>{
+    try{
+        const{idUser} = req.body;
+        // check if user is available
+        const trainer = await User.findByPk(idUser)
+        if(!trainer){
+            return res.status(400).json({
+                message : "No trainer was found "
+            })
+        }
+        const sessionsForTrainer = await Session.findAll({
+        where: {
+            available_times_user_iduser : trainer.iduser
+        }
+        })
+        if(!sessionsForTrainer){
+            return res.status(400).json({
+                message : "This trainer does not have any sessions booked yet"
+            })
+        }
+        return res.status(200).json({
+            message : `Session for ${trainer.first_name} were found`,
+            sessionsForTrainer
+        })
+    }catch(error){
+        return res.status(500).json({
+            message : "Server Error"
+        })
+    }
+}
+
+
 // get all done sessions for a trainer
-// get all session for child 
+exports.getDoneSessionsForTrainer = async (req, res) =>{
+    try{
+        const{idUser} = req.body;
+        // check if user is available
+        const trainer = await User.findByPk(idUser)
+        if(!trainer){
+            return res.status(400).json({
+                message : "No trainer was found "
+            })
+        }
+        const sessionsForTrainer = await Session.findAll({
+        where: {
+            available_times_user_iduser : trainer.iduser,
+            is_done : true
+        }
+        })
+        if(!sessionsForTrainer){
+            return res.status(400).json({
+                message : "This trainer does not has no sessions done yet"
+            })
+        }
+        return res.status(200).json({
+            message : `Session for ${trainer.first_name} were found`,
+            sessionsForTrainer
+        })
+    }catch(error){
+        return res.status(500).json({
+            message : "Server Error"
+        })
+    }
+}
+
+
+// get all sessions for child
+exports.getAllSessionsForChild = async (req, res) =>{
+    try{
+        const{idChild} = req.body;
+        // check if user is available
+        const child = await Child.findByPk(idChild)
+        if(!child){
+            return res.status(400).json({
+                message : "No child was found "
+            })
+        }
+        const sessionsForchild = await Session.findAll({
+        where: {
+            children_idchild : child.idchildren
+        }
+        })
+        if(!sessionsForchild){
+            return res.status(400).json({
+                message : "This child does not has no sessions done yet"
+            })
+        }
+        return res.status(200).json({
+            message : `Session for ${child.first_name} were found`,
+            sessionsForchild
+        })
+    }catch(error){
+        return res.status(500).json({
+            message : "Server Error"
+        })
+    }
+}
+
 // get all done sessions for a child
+exports.getDoneSessionsForChild = async (req, res) =>{
+    try{
+        const{idChild} = req.body;
+        // check if user is available
+        const child = await Child.findByPk(idChild)
+        if(!child){
+            return res.status(400).json({
+                message : "No child was found "
+            })
+        }
+        const sessionsForchild = await Session.findAll({
+        where: {
+            children_idchild : child.idchildren,
+            is_done :  true
+        }
+        })
+        if(!sessionsForchild){
+            return res.status(400).json({
+                message : "This child does not has no sessions done yet"
+            })
+        }
+        return res.status(200).json({
+            message : `Session for ${child.first_name} were found`,
+            sessionsForchild
+        })
+    }catch(error){
+        console.log("Server Error" , error.message);
+        return res.status(500).json({
+            message : "Server Error"
+        })
+    }
+}
+
 // get sessions dates for package and if they are done or not
-// update session
+exports.findSessionsForPkg = async (req, res)=>{
+    try{
+        const{package_id} = req.body;
+        const sessions = await Session.findAll({
+            where : {
+                packeges_idpackeges : package_id
+            },
+            include:[{
+                model: Child,
+                as: 'children',
+                attributes : ['first_name' , 'last_name' ]
+            },
+            {
+                model : AvailabeTimes,
+                as : 'user_iduser',
+                attributes : ['first_name' , 'last_name']
+            }
+        ]
+        })
+        if(!sessions){
+            return res.status(400).json({
+                message : "Sessions for the requested package did not found"
+            })
+        }
+        return res.status(200).json({
+            message : "Sessions were found",
+            sessions
+        });
+    }catch(error){
+        console.log("Server Error" , error.message);
+        return res.status(500).json({
+            message : "Server Error"
+        });
+    }
+}
+
+
+// update appointment for session
+
+exports.updateSession = async (req,res)=>{
+    try{
+
+    }catch(error){
+
+    }
+}

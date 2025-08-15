@@ -5,7 +5,8 @@ const {Packages,Child , Spec, Session} = require('../models');
 // create package 
 exports.createPackage = async(req,res) =>{
     try{
-        const {childId , notes,package_desc ,spe_type } =req.body ;
+        const {childId , notes, package_desc ,spe_type } =req.body ;
+        console.log(req.body)
         // check if child existes
         const child = await Child.findByPk(childId)
         //check if specillization exites
@@ -24,8 +25,8 @@ exports.createPackage = async(req,res) =>{
             const newPackage = await Packages.create({
                 children_idchild : child.idchildren,
                 specializtion_idspecializtion : spec.idspecializtion,
-                package_desc : package_desc,
-                notes : notes || null
+                notes : notes || null,
+                package_desc : package_desc ,
             });
             if(newPackage){
                 return res.status(200).json({
@@ -83,3 +84,12 @@ exports.viewPackageForaChild = async(req, res) =>{
     }
 }
 
+// number of sessions done for a child per package
+
+// all packages for a child
+
+// count of done sessions per package
+
+// progress rate for package after session 8
+
+// all trtainers in package

@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt =  require('jsonwebtoken');
 const user = require("../models/user");
 const { where } = require("sequelize");
+const { escape } = require("mysql");
 
 const maxAge = 3 * 24 * 60 * 60;
 const createToken = (id) =>{
@@ -226,9 +227,12 @@ exports.findTrainByNatId = async(req, res) =>{
   }
 }
 
+
+
 // get all active users
 exports.getAllActiveTrainers = async (req, res) =>{
   try{
+    //add sepcialization 
     const allActiveTrainers = await User.findAll({
       where:{
         is_active : true
@@ -266,3 +270,31 @@ exports.getAllNotActiveTrainers = async (req, res) =>{
 }
 
 
+// search by name or phone
+exports.findByNameOrPhone = async (req,res)=>{
+  try{
+    const {first_name , last_name , phone_number} = req.body;
+    const trainers = await User.findAll({
+      where : {
+        first_name : first_name ,
+        last_name : last_name , 
+        phone_number : phone_number
+      }
+    })
+  if(!trainers){
+    console.log("error fetching trainers ")
+    return res.status(400).json({
+      message : "Error fetching trainers!"
+    })
+  }
+  return res.status(200).json({
+    message : `Trainers according to ${first_name} ${last_name} ${phone_number} :`,
+    trainers
+  })
+  }catch(error){
+    console.log("Error fetching data" , error.message)
+    return res.status(500).json({
+      message : "Server Error"
+    })
+  }
+}
