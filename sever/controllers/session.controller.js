@@ -509,8 +509,10 @@ exports.findSessionsForPkg = async (req, res)=>{
 
 exports.updateSession = async (req,res)=>{
     try{
-
+        
     }catch(error){
 
     }
 }
+
+// add notes for 0 session 

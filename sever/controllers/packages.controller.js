@@ -84,6 +84,7 @@ exports.viewPackageForaChild = async(req, res) =>{
     }
 }
 
+
 // number of sessions done for a child per package
 
 // all packages for a child
@@ -92,4 +93,4 @@ exports.viewPackageForaChild = async(req, res) =>{
 
 // progress rate for package after session 8
 
-// all trtainers in package
+// all trainers in package

@@ -1,6 +1,6 @@
 const { Child , Parent  } = require("../models");
 const { Op } = require("sequelize");
-const { all } = require("../routes/user.routes");
+
 
 // create child and parent
 exports.createChild =  async (req, res) => {
@@ -42,7 +42,7 @@ exports.createChild =  async (req, res) => {
         last_name: last_name_child,
         birth_date: birth_date_child,
         gender: gender_child,
-        parents_idparents: parent.idparents 
+        parents_idparents: parent.idparents
     });
 
     return res.status(201).json({
@@ -159,7 +159,7 @@ exports.countOfChildrenThisMonth = async (req,res)=>{
 
         const childrenCount = await Child.count({
             where : {
-                created_At : {
+                createdAt : {
                     [Op.gte]: startOfMonth,
                     [Op.lt]: endOfMonth
                 }
@@ -185,5 +185,52 @@ exports.countOfChildrenThisMonth = async (req,res)=>{
 }
 
 // find child by parent phone or child name 
+exports.findChild = async (req,res) =>{
+    try{
+        console.log("Hi")
+        const{first_name, last_name, phone_number} = req.body;
+        if (!first_name && !phone_number && last_name) {
+            return res.status(400).json({ message: "Send first_name or phone_number" });
+            }
+        const child = await Child.findAll({
+            where: {
+                [Op.or]: [
+                    { first_name: first_name },
+                    { last_name: last_name },
+                    { '$parent.phone_number$': phone_number }
+                ]
+                },
+            include : [{
+                model : Parent,
+                as: 'parent',
+                attributes: ['first_name','last_name','phone_number'],
+                required: false,
+            }]
+        })
+        if(!child || child.length == 0){
+            console.log("No Child was found")
+            return res.status(400).json({
+                message : "No child was found",
+                
+            })
+        }
+        return res.status(200).json({
+            message : "Child was found",
+            child
+        })
+    }catch(error){
+        console.log("Server Error" , error.message)
+        return res.status(500).json({
+            message : "Server Error"
+        })
+    }
+}
 
-// delete child 
+// delete child
+exports.deleteChild = async (req,res)=>{
+    try{
+        
+    }catch(error){
+
+    }
+}

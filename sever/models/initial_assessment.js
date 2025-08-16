@@ -2,7 +2,6 @@ const Sequelize = require('sequelize');
 
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('initial_assessment', {
-
     idinitial_assessment: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
