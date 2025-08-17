@@ -12,7 +12,7 @@ router.get("/allSessionsfortrainer" , requireAuth, sessionControler.getSessionsF
 router.get("/all-done-sessions-for-trainer" , requireAuth , sessionControler.getDoneSessionsForTrainer);
 router.get("/all-done-sessions-for-child" , requireAuth , sessionControler.getDoneSessionsForChild);
 router.get("/all-sessions-for-child" , requireAuth , sessionControler.getAllSessionsForChild);
-router.get("sessions-for-pkg" , requireAuth , sessionControler.findSessionsForPkg);
+router.get("/sessions-for-pkg" , requireAuth , sessionControler.findSessionsForPkg);
 
 
 module.exports = router ; 

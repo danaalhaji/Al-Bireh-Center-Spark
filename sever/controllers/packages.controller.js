@@ -1,5 +1,6 @@
 const { where } = require('sequelize');
 const {Packages,Child , Spec, Session} = require('../models');
+const packeges = require('../models/packeges');
 
 
 // create package 
@@ -88,6 +89,41 @@ exports.viewPackageForaChild = async(req, res) =>{
 // number of sessions done for a child per package
 
 // all packages for a child
+exports.pkgByChild = async (req,res)=>{
+    try{
+        const{idchildren} = req.body;
+        const child = await Child.findByPk(idchildren)
+        if(!child){
+            return res.status(400).json({
+                message : "No Child was found"
+            })
+        }
+        const pkgs = await packeges.findAll({
+            where :{
+                children_idchild : child.idchildren
+            },include : [{
+                model : Child,
+                as : 'child',
+                attributes : ['first_name' , 'last_name' ]
+            }]
+        })
+        if(!pkgs || pkgs.length == 0){
+            return res.status(400).json({
+                message : "No pckages was found"
+            })
+        }
+        return res.status(200).json({
+            message : `Packages for ${child.first_name} ${child.last_name} are : `,
+            pkgs
+        })
+
+    }catch(error){
+        console.log("Server Error" , error.message);
+        return res.status(500).json({
+            message : "Server Error"
+        })
+    }
+}
 
 // count of done sessions per package
 
