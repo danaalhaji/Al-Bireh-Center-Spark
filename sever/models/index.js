@@ -37,5 +37,8 @@ db.Child.hasMany(db.Packages , { foreignKey:"children_idchild"});
 db.Payment.belongsTo(db.Packages, { foreignKey: "packeges_idpackeges" });
 db.Packages.hasMany(db.Payment, {foreignKey: "packeges_idpackeges" });
 
+db.Packages.hasMany(db.Session , {foreignKey : "packeges_idpackeges"});
+db.Session.belongsTo(db.Packages , {foreignKey : "packeges_idpackeges"})
+
 
 module.exports = db;

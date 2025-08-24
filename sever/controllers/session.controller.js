@@ -509,10 +509,31 @@ exports.findSessionsForPkg = async (req, res)=>{
 
 exports.updateSession = async (req,res)=>{
     try{
+        const {sessionID, date, time, package_id, session_type ,notes,idUser,idChild } = req.body;
+        const sessionAvailable = await Session.findByPk(sessionID);
+        if(!sessionAvailable){
+            return res.status(400).json({
+                message : "Session not found"
+            })
+        }
+        // check if child is exist
+        const child = await Child.findByPk(idChild);
+        if(!child){
+            return res.status(400).json({
+                message : "Child not found"
+            })
+        }
+        // check trainer
+        const trainer = await User.findByPk(idUser);
+        if(!trainer){
+            return res.status(400).json({
+                message : "Trainer not found"
+            })
+        }
         
     }catch(error){
 
     }
 }
 
-// add notes for 0 session 
+// add initial assemnt recommendation 

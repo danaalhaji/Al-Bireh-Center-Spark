@@ -87,6 +87,52 @@ exports.viewPackageForaChild = async(req, res) =>{
 
 
 // number of sessions done for a child per package
+exports.numberOfDoneSessions = async (req,res)=>{
+    try{
+        const {childId} = req.body;
+        // find child
+        const child = await Child.findByPk(childId);
+        if(!child){
+            return res.status(400).json({
+                message :"Child not found"
+            })
+        }
+        const allPackages = await Packages.findAll({
+            include :[{
+                model : Child,
+                as: 'child',
+                where : {idchildren : child.idchildren},
+                attributes: ['first_name' , 'last_name']
+        },{
+                model :Session,
+                as: 'sessions' ,
+                where : {is_done : true},
+                attributes : ['session_number', 'session_date' , 'is_done' , 'notes']  
+            }
+    ]
+        })
+        if(!allPackages || allPackages.length == 0){
+            return res.status(400).json({
+                message :"This child has no packages yet!"
+            })
+        }
+        // count of done session per package
+        const result = allPackages.map(pkgs => ({
+            idpackeges: pkgs.idpackeges,
+            sessionsCount: pkgs.sessions ? pkgs.sessions.length : 0
+        }));
+
+        return res.status(200).json({
+            message : "The follwing pac",
+            data : result
+        })
+    }catch(error){
+        console.log("Server Error" , error.message)
+        return res.status(500).json({
+            message : "Server Error"
+        })
+    }
+}
 
 // all packages for a child
 exports.pkgByChild = async (req,res)=>{
@@ -125,8 +171,23 @@ exports.pkgByChild = async (req,res)=>{
     }
 }
 
-// count of done sessions per package
 
-// progress rate for package after session 8
+//add progress rate for package after session 8
+
+exports.addProgressRate = async(req, res)=>{
+    try{
+        const{packageID} = req.body;
+        const pkg = await Packages.findByPk(packageID);
+        if(!pkg){
+            return res.status(400).json({
+                message : "No package was found "
+            })
+        }
+        
+
+    }catch(error){
+
+    }
+}
 
 // all trainers in package

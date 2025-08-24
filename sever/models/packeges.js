@@ -9,7 +9,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     num_of_sessions: {
       type: DataTypes.INTEGER,
-      defaultValue : 5,
+      defaultValue : 8,
       allowNull: true
     },
     progress_rate: {

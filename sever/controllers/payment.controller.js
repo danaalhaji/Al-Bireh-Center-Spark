@@ -47,6 +47,44 @@ exports.addPayment = async (req , res )=>{
 
 
 // total amount paid this month
+exports.totalPaidThisMonth = async(req,res)=>{
+    try{
+        let sum =0 ; 
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+
+        const endOfMonth = new Date(startOfMonth);
+        endOfMonth.setMonth(endOfMonth.getMonth() + 1);
+        const payments = await Payment.findAll({
+            where : {
+                craetedAt: {
+                    [Op.gte]: startOfMonth,
+                    [Op.lt]: endOfMonth
+                    }
+            }
+        })
+        if(!payments || payments.length == 0){
+            return res.status(400).json({
+                message : "No payments for this month",
+                data : sum
+            })
+        }
+
+        for (let i = 0 ; i< payments.lentgh ; i++){
+            sum+=payments.amount
+        }
+        return res.status(200).json({
+            message : `total amount paid is ${sum})`,
+            data : sum
+        })
+    }catch(error){
+        console.log("server error", error.message);
+        return res.status(500).json({
+            message : "Server Error"
+        })
+    }
+}
 
 // total unpaid amount for non zero balance pkg
 
