@@ -176,17 +176,43 @@ exports.pkgByChild = async (req,res)=>{
 
 exports.addProgressRate = async(req, res)=>{
     try{
-        const{packageID} = req.body;
-        const pkg = await Packages.findByPk(packageID);
-        if(!pkg){
+        const{idpackeges ,progressRate} = req.body;
+        const pkg = await Packages.findOne({
+            where : { idpackeges : idpackeges},
+            include : [{
+                model :Session,
+                as: 'sessions' ,
+                where : {is_done : true},
+                attributes : ['session_number', 'session_date' , 'is_done' , 'notes']  
+            }]
+        });
+
+        if(!pkg || pkg.length == 0){
             return res.status(400).json({
-                message : "No package was found "
+                message : "No package was found od this package have less than 8 done sessions"
             })
         }
-        
-
+        console.log(pkg.sessions.length)
+        if(pkg.sessions.length == 8){
+            await pkg.update({
+                progress_rate :  progressRate
+            })
+            console.log("Progress rate was added succefully " , pkg)
+            return res.status(200).json({
+            message : "Packgae rate was added successfully ",
+            data :  pkg
+        })
+        }
+            console.log("Cannot add rate for this package because the sessions are less than 8 " , pkg)
+            return res.status(400).json({
+            message : "Cannot add rate for this package because the sessions are less than 8",
+            data :  pkg
+        })
     }catch(error){
-
+        console.log("Server Error" , error.message);
+        return res.status(500).json({
+            message : "Server Error"
+        })
     }
 }
 
