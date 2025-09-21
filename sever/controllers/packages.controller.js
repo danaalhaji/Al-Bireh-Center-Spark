@@ -1,12 +1,12 @@
 const { where } = require('sequelize');
-const {Packages,Child , Spec, Session} = require('../models');
+const {Packages,Child , Spec, Session, Payment} = require('../models');
 const packeges = require('../models/packeges');
 
 
 // create package 
 exports.createPackage = async(req,res) =>{
     try{
-        const {childId , notes, package_desc ,spe_type } =req.body ;
+        const {childId , notes ,spe_type } =req.body ;
         console.log(req.body)
         // check if child existes
         const child = await Child.findByPk(childId)
@@ -20,14 +20,20 @@ exports.createPackage = async(req,res) =>{
             return res.status(400).json({
                 message : "Error in child or speclization !"
             })
-            
         }else{
             console.log(`child ${child.first_name} , spec ${spec.spe_type}`)
+            const count = await Packages.count({
+                where : {
+                    specializtion_idspecializtion : spec.idspecializtion ,
+                    children_idchild : child.idchildren
+                }
+            })
+            const package_name = count + 1 
             const newPackage = await Packages.create({
                 children_idchild : child.idchildren,
                 specializtion_idspecializtion : spec.idspecializtion,
                 notes : notes || null,
-                package_desc : package_desc ,
+                package_name : spe_type + "  " + package_name 
             });
             if(newPackage){
                 return res.status(200).json({
@@ -144,7 +150,7 @@ exports.pkgByChild = async (req,res)=>{
                 message : "No Child was found"
             })
         }
-        const pkgs = await packeges.findAll({
+        const pkgs = await Packages.findAll({
             where :{
                 children_idchild : child.idchildren
             },include : [{
@@ -217,3 +223,62 @@ exports.addProgressRate = async(req, res)=>{
 }
 
 // all trainers in package
+exports.findTrainersPerPackage = async (req,res)=>{
+    try{
+        const{ pkgID} = req.body;
+        const allTrainersInpkg = await Packages.findOne({
+            where : {
+                idpackeges : pkgID
+            }, include : [{
+                model : Session,
+                as : 'sessions', 
+                attributes : ['session_number' , 'session_date' , 'session_time' , 'is_done', '$']
+            }]
+        })
+    }catch(error){
+        console.log("Server Error" , error.message);
+        return res.status(500).json({
+            message : "Server Error"
+        })
+    }
+}
+
+
+// all packages for a child and date child created in
+exports.allPKGandCratedDateChild = async (req,res)=>{
+    try{
+        const{childId} =  req.body;
+        const child = await Child.findByPk(childId);
+        if(!child){
+            console.log("N child was found")
+            return res.status(400).json(
+                {message : "No child was found"}
+            )
+        }
+        const Total_paymenst = []
+        const pkgsAndChild = await Packages.findAll({
+            where: {
+                children_idchild : child.idchildren
+            }, include : [{
+                model : Child,
+                as : 'child',
+                attributes : ['first_name' , 'last_name', 'createAt' ]
+            }]
+        })
+        if(!pkgsAndChild){
+            console.log("N pkgs was found")
+            return res.status(400).json(
+                {message : "No pkgs was found"}
+            )
+        }
+        return res.status(200).json({
+            message : "Pkgs for child and date created in",
+            data : pkgsAndChild
+        })
+    }catch(error){
+        console.log("Server Error" , error.message);
+        return res.status(500).json({
+            message : "Server Error"
+        })
+    }
+}

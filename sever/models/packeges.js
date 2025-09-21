@@ -25,12 +25,12 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(45),
       allowNull: true
     },
-    balance: {
+    balance : {
       type: DataTypes.INTEGER,
       defaultValue : "-500",
       allowNull: true
     },    
-    specializtion_idspecializtion: {
+    specializtion_idspecializtion : {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -38,19 +38,19 @@ module.exports = function(sequelize, DataTypes) {
         key: 'idspecializtion'
       }
     },
-    children_idchild: {
+    children_idchild : {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: 'children',
         key: 'idchildren'
-      },
-    package_name: {
-      type: DataTypes.STRING,
+      }
+},
+    package_name : {
+      type : DataTypes.STRING,
       unique : true,
-      allowNull: false
+      allowNull: true,
     },
-}
   }
   , {
     sequelize,

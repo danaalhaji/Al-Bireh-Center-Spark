@@ -21,7 +21,6 @@ db.Payment = require('./payment')(sequelize, DataTypes);
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-
 db.User.belongsTo(db.Spec, { foreignKey: "specializtion_idspecializtion" });
 db.Spec.hasMany(db.User, { foreignKey: "specializtion_idspecializtion" });
 
@@ -34,11 +33,15 @@ db.Child.hasMany(db.Session,{foreignKey: "children_idchild"});
 db.Packages.belongsTo(db.Child, { foreignKey:"children_idchild"});
 db.Child.hasMany(db.Packages , { foreignKey:"children_idchild"});
 
-db.Payment.belongsTo(db.Packages, { foreignKey: "packeges_idpackeges" });
+db.Payment.belongsTo(db.Packages, { foreignKey: "packeges_idpackeges" , as: "packeges_idpackeges_packege" });
 db.Packages.hasMany(db.Payment, {foreignKey: "packeges_idpackeges" });
 
 db.Packages.hasMany(db.Session , {foreignKey : "packeges_idpackeges"});
 db.Session.belongsTo(db.Packages , {foreignKey : "packeges_idpackeges"})
 
+db.Session.belongsTo(db.AvailabeTimes, {  foreignKey: "available_times_idavailable" });
+db.AvailabeTimes.hasMany(db.Session, { foreignKey: "available_times_idavailable" });
+db.Session.belongsTo(db.AvailabeTimes, { foreignKey: "available_times_user_iduser" });
+db.AvailabeTimes.hasMany(db.Session, { foreignKey: "available_times_user_iduser" });
 
 module.exports = db;

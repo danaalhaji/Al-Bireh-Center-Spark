@@ -53,16 +53,20 @@ module.exports = function(sequelize, DataTypes) {
         key: 'idavailable'
       }
     },
+    single_payment :{
+      type : DataTypes.FLOAT,
+      allowNull : true
+    },
     available_times_user_iduser: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
+      type : DataTypes.INTEGER,
+      allowNull : false,
+      references : {
         model: 'available_times',
         key: 'user_iduser'
       }
     },
-  children_idchild: {
-    type: DataTypes.INTEGER,
+  children_idchild : {
+    type : DataTypes.INTEGER,
     allowNull: false,
     references: {
       model: 'children',

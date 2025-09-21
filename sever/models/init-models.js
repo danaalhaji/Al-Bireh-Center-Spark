@@ -115,11 +115,11 @@ function initModels(sequelize) {
   available_times.hasMany(session, { as: "available_times_user_iduser_sessions", foreignKey: "available_times_user_iduser" });
 
   // Child-Parent
-  children.belongsTo(parents, { as: "parents_idparents_parent", foreignKey: "parents_idparents" });
+  children.belongsTo(parents, { as: "parents", foreignKey: "parents_idparents" });
   parents.hasMany(children, { as: "children", foreignKey: "parents_idparents" });
 
   // Child-Sessions
-  session.belongsTo(children, { as: "children_idchild", foreignKey: "children_idchild" });
+  session.belongsTo(children, { as: "child", foreignKey: "children_idchild" });
   children.hasMany(session, { as: "sessions", foreignKey: "children_idchild" });
 
   //Child-Packages
@@ -127,7 +127,7 @@ function initModels(sequelize) {
   children.hasMany(packeges, {as: "packeges",foreignKey: "children_idchild"});
   
   // Specialization-Packages
-  packeges.belongsTo(specializtion, { as: "specializtion_idspecializtion", foreignKey: "specializtion_idspecializtion" });
+  packeges.belongsTo(specializtion, { as: "specializtion", foreignKey: "specializtion_idspecializtion" });
   specializtion.hasMany(packeges, { as: "packeges", foreignKey: "specializtion_idspecializtion" });
 
   // Package-Payment

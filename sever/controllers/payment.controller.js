@@ -1,4 +1,5 @@
-const { Packages, Child, Payment } = require('../models');
+const { where , Op} = require('sequelize');
+const { Packages, Child, Payment, Session } = require('../models');
 
 // Add payment to package 
 exports.addPayment = async (req , res )=>{
@@ -85,15 +86,125 @@ exports.totalPaidThisMonth = async(req,res)=>{
         })
     }
 }
+// Total Payment for a child
+/* **************ADD Single Payment *****************
+*/
+exports.totalPaidByChild = async (req,res)=>{
+    try{
+        const{childID , thisMonth} = req.body;
+        const payments = await Payment.findAll({
+            include : [{
+                model : Packages,
+                as : "packeges_idpackeges_packege",
+                where: {
+                    children_idchild : childID
+                }
+            }]
+        })
+        if(!payments || payments.length == 0){
+            return res.status(400).json({
+                message : "Error fetching payments"
+            })
+        }
+        return res.status(200).json({
+            message :"Payemnts for child are:",
+            payments
+        })
+    }catch(error){
+        console.log("server error", error.message);
+        return res.status(500).json({
+            message : "Server Error"
+        })
+    }
+}
+
 
 // total unpaid amount for non zero balance pkg
 
-// Total Payment for a child
-
-// amount paid per package per month
-
 // left amount to be paid for a package
+exports.leftToBePaidByPkg = async (req,res)=>{
+    try{
+        const {pkgId} = req.body;
+        const pkg = await Packages.findByPk(pkgId)
+        if(!pkg){
+            console.log("No pkg was found!")
+            return res.status(400).json({
+                message : "No Package was found"
+            })
+        }
+        const leftToBePaid = pkg.balance * -1;
+        return res.status(200).json({
+            message : `Amount to be Paid ${leftToBePaid}`,
+            data: leftToBePaid
+        })
+    }catch(error){
+        return res.status(500).json({
+            message : "Server Error"
+        })
+    }
+}
 
 //return payment dates for child
+exports.paymentsDates = async (req,res)=>{
+    try{
+    const{childId} = req.body;
+    const child = await Child.findByPk(childId);
+    if(!child){
+        console.log("No child was found");
+        return res.statu(400).json({
+            message : "No Child was found"
+        })
+    }
+    const sessions = await Session.findAll({
+        where : {
+            session_type : ["1" , "0"],
+            single_payment :{
+                [Op.gte] : 0
+            }
+        },
+        attributes : ["createdAt" , "single_payment" , "session_type" ] 
+    })
+/*
+    const pksByChild = await Packages.findAll({
+        where : {
+            children_idchild : child.idchildren
 
-// payment for sessions
+        }
+    })
+*/
+    const paymentsByChildPkgs = await Payment.findAll({
+  include: [
+    {
+      model: Packages,
+      as: "packeges_idpackeges_packege",
+      required: true,
+      attributes : ["idpackeges" , "package_name"],
+      include: [
+        {
+          model: Child,
+          as: "child",
+          where: { idchildren: child.idchildren },
+          attributes : []
+        },
+      ],
+    },
+
+],    attributes: ["createdAt"]
+    })
+    console.log(paymentsByChildPkgs)
+    if(!paymentsByChildPkgs){
+        return res.status(400).json({
+            message : "No pkg for child "
+        })
+    }
+    return res.status(200).json({
+        message : "Pyaments were found ",
+        data : paymentsByChildPkgs
+    })
+}catch(error){
+    console.log(error.message)
+    return res.status(500).json({
+    message : "Server Error"
+        })
+}
+}

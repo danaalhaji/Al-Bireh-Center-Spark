@@ -7,5 +7,5 @@ const { adminAuth } = require("../middleware/authMiddleware");
 
 router.post("/addTimes", adminAuth , timesController.createTimesForTrainer);
 router.get("/findTimes", adminAuth , timesController.getTimesForTrainer);
-
+router.put('/update-time', adminAuth , timesController.updateTimes);
 module.exports = router;

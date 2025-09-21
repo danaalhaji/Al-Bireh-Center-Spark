@@ -1,6 +1,7 @@
 const { User, Session , AvailabeTimes ,Packages, Child } = require("../models");
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 const session = require("../models/session");
+const { database } = require("../config/config");
 
 // create session
 
@@ -247,10 +248,10 @@ exports.sessionThisMonth = async (req, res) => {
         endOfMonth.setMonth(endOfMonth.getMonth() + 1);
 
         const sessionsThisMonth = await Session.count({
-          where: {
+            where: {
             session_date: {
-              [Op.gte]: startOfMonth,
-              [Op.lt]: endOfMonth
+                [Op.gte]: startOfMonth,
+                [Op.lt]: endOfMonth
             }
         }})
         return res.status(200).json({
@@ -275,10 +276,10 @@ exports.allSessionsThisMonth = async (req, res) => {
         endOfMonth.setMonth(endOfMonth.getMonth() + 1);
         // add child and trainer
         const sessionsThisMonth = await Session.findAll({
-          where: {
+            where: {
             session_date: {
-              [Op.gte]: startOfMonth,
-              [Op.lt]: endOfMonth
+                [Op.gte]: startOfMonth,
+                [Op.lt]: endOfMonth
             }
         }})
         return res.status(200).json({
@@ -313,10 +314,10 @@ exports.allSessionsThisMonthForTrainer = async (req, res) => {
             })
         }
         const sessionsThisMonth = await Session.findAll({
-          where: {
+            where: {
             session_date: {
-              [Op.gte]: startOfMonth,
-              [Op.lt]: endOfMonth
+                [Op.gte]: startOfMonth,
+                [Op.lt]: endOfMonth
             },
             available_times_user_iduser : user.iduser
         }})
@@ -329,9 +330,6 @@ exports.allSessionsThisMonthForTrainer = async (req, res) => {
             res.status(500).json({ message: "Server error" });
     }
 }
-
-
-
 
 // get all sessions for a trainer
 
@@ -366,7 +364,6 @@ exports.getSessionsForTrainer = async (req, res) =>{
     }
 }
 
-
 // get all done sessions for a trainer
 exports.getDoneSessionsForTrainer = async (req, res) =>{
     try{
@@ -399,7 +396,6 @@ exports.getDoneSessionsForTrainer = async (req, res) =>{
         })
     }
 }
-
 
 // get all sessions for child
 exports.getAllSessionsForChild = async (req, res) =>{
@@ -504,9 +500,9 @@ exports.findSessionsForPkg = async (req, res)=>{
     }
 }
 
-
-// update appointment for session
-
+/****************************************** */
+//*******update appointment for session*****//
+/****************************************** */
 exports.updateSession = async (req,res)=>{
     try{
         const {sessionID, date, time, package_id, session_type ,notes,idUser,idChild } = req.body;
@@ -537,3 +533,80 @@ exports.updateSession = async (req,res)=>{
 }
 
 // add initial assemnt recommendation 
+exports.addInitialAssment = async (req,res) =>{
+    try{
+        const{chidID, notes} = req.body;
+        const child = await Child.findOne({
+            where : {
+                idchildren : chidID,
+            },
+            include : [{
+                model : Session,
+                as: "sessions",
+                where : {
+                session_type: "0",
+                is_done: true
+                },
+                attributes : ["idsession"]
+            }]
+        });
+        if(!child || child.length == 0){
+            console.log("No Child Was found or this child did not book any initial assesment yet")
+        }
+        const initalSession = await Session.findByPk(child.sessions[0].idsession)
+        await initalSession.update({
+            notes:notes
+        })
+        console.log(initalSession)
+        return res.status(200).json({
+            message : "Initial Assment was added",
+            initalSession
+        })
+    }catch(error){
+        console.log("Server Error" , error.message);
+        return res.status(500).json({
+            message : "Server Error"
+        });
+    }
+}
+
+
+// veiw inital assement
+exports.viewInitialassement  = async (req, res) =>{
+    try{
+        const {childID} = req.body;
+        // checif child id is correct 
+        const child = await Child.findByPk(childID);
+        if(!child){
+            console.log("No child was found ")
+            return res.status(400).json({
+                message : `No child with ${childID} ID was found`
+            })
+        }
+        const inital_assesment = await Session.findAll({
+            where : {   
+                session_type : "0",
+                children_idchild : childID,
+                
+            },
+            attributes : ["session_date", "session_time" , "notes" , "available_times_user_iduser"]
+        })
+        if(!inital_assesment){
+            console.log("No inital assement was done for this child")
+            return res.status(400).json({
+                message : "No inital assesment was found",
+            })
+        }
+        return res.status(200).json({
+            message : "inital assment done along with the following data:",
+            data : inital_assesment
+        })
+    }catch(error){
+        console.log("Server Error" , error.message);
+        return res.status(500).json({
+            message : "Server Error"
+        });
+    }
+}
+// single payment// لازم يضيف عن اي جلسة ؟؟ حسب الفرونت !
+// after the third delay the session considered done

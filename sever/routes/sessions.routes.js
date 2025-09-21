@@ -13,6 +13,9 @@ router.get("/all-done-sessions-for-trainer" , requireAuth , sessionControler.get
 router.get("/all-done-sessions-for-child" , requireAuth , sessionControler.getDoneSessionsForChild);
 router.get("/all-sessions-for-child" , requireAuth , sessionControler.getAllSessionsForChild);
 router.get("/sessions-for-pkg" , requireAuth , sessionControler.findSessionsForPkg);
-
-
+router.patch("/add-inital-assment" , adminAuth , sessionControler.addInitialAssment);
+// update appointment for session
+router.patch("/update-session" , adminAuth , sessionControler.updateSession);
+router.get("/view-inital-assement" , requireAuth , sessionControler.viewInitialassement);
+// single payment
 module.exports = router ; 

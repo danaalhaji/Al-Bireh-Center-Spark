@@ -1,9 +1,10 @@
 const { User , Spec} = require("../models"); 
 const bcrypt = require("bcrypt");
 const jwt =  require('jsonwebtoken');
-const user = require("../models/user");
+//const user = require("../models/user");
 const { where } = require("sequelize");
 const { escape } = require("mysql");
+const user = require("../models/user");
 
 const maxAge = 3 * 24 * 60 * 60;
 const createToken = (id) =>{

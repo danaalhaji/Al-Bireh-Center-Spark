@@ -4,7 +4,7 @@ const { Op } = require("sequelize");
 
 // create child and parent
 exports.createChild =  async (req, res) => {
-  try {
+    try {
     const {
         parent_id,
         first_name_parent,
@@ -51,10 +51,10 @@ exports.createChild =  async (req, res) => {
         child: newChild
     });
 
-  } catch (error) {
+    } catch (error) {
     console.error("Error adding child with parent:", error);
     return res.status(500).json({ error: "Internal Server Error" });
-  }
+    }
 };
 
 // count all children
